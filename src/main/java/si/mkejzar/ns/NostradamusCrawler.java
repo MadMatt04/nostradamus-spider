@@ -10,12 +10,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,10 +26,10 @@ public class NostradamusCrawler {
             .put("SuperMario45", new User("Blaž", "SuperMario45"))
             .put("HHrv", new User("Helena", "HHrv"))
             .put("grega,gor", new User("Grega", "grega.gor"))
-            .put("saxorut", new User("Sašo", "saxorut"))
+            .put("skipper3k", new User("Luka", "skipper3k"))
             .build();
 
-    private final String baseUrl = "http://www.rtvslo.si/nostradamus/svetovno-prvenstvo-brazilija-2014/lestvica";
+    private final String baseUrl = "http://www.rtvslo.si/nostradamus/evropsko-prvenstvo-francija-2016/lestvica";
     private final String page = "/?page=";
     private final int pages = 35;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd. MM. uuuu HH:mm");
@@ -64,9 +59,7 @@ public class NostradamusCrawler {
                     if (m.find()) {
                         int ranking = Integer.parseInt(m.group(1));
                         int score = Integer.parseInt(m.group(2));
-                        if (user.getUsername().equals("grega.gor")) {
-                            score += 2;
-                        }
+
                         System.out.println("FOUND, pts: " + score + ", ranking: " + ranking);
                         user.setScore(score);
                         user.setRanking(ranking);
