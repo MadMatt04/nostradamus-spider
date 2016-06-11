@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -18,17 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
- * Created by matija on 17/06/14.
+ * @author matijak on 17/06/14.
  */
+@SuppressWarnings({"UseOfSystemOutOrSystemErr", "HardcodedLineSeparator", "MethodWithMultipleLoops"})
 public class NostradamusCrawler {
 
     private final Map<String, User> users;
 
-    private final String baseUrl = "http://www.rtvslo.si/nostradamus/evropsko-prvenstvo-francija-2016/lestvica";
-    private final String page = "/?page=";
-    private final int pages = 35;
+    private final String baseUrl;
+    private final String page;
+    private final int pages;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd. MM. uuuu HH:mm");
 
     private final Map<User, Pattern> regexMap = new HashMap<>();
@@ -43,6 +44,10 @@ public class NostradamusCrawler {
         users.put("grega,gor", new User("Grega", "grega.gor"));
         users.put("skipper3k", new User("Luka", "skipper3k"));
         users.put("zzl02", new User("Žiga", "zzl02"));
+
+        baseUrl = "http://www.rtvslo.si/nostradamus/evropsko-prvenstvo-francija-2016/lestvica";
+        page = "/?page=";
+        pages = 35;
     }
 
     public void crawl() throws IOException {
@@ -53,12 +58,13 @@ public class NostradamusCrawler {
 
         for (int p = 0; p < pages && !usersToFind.isEmpty(); p++) {
             HttpGet httpget = new HttpGet(baseUrl + page + p);
-            CloseableHttpResponse response = httpClient.execute(httpget);
-            System.out.println("Reading page " + p);
-            if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println("Did not receive 200, exiting after " + httpget.getURI());
-            }
-            try {
+
+            try (CloseableHttpResponse response = httpClient.execute(httpget)) {
+                System.out.println("Reading page " + p);
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    System.out.println("Did not receive 200, exiting after " + httpget.getURI());
+                }
+
                 String content = EntityUtils.toString(response.getEntity());
                 for (Iterator<User> it = usersToFind.iterator(); it.hasNext(); ) {
                     User user = it.next();
@@ -77,8 +83,6 @@ public class NostradamusCrawler {
                         System.out.println("not found");
                     }
                 }
-            } finally {
-                response.close();
             }
         }
     }
@@ -89,8 +93,9 @@ public class NostradamusCrawler {
         sb.append(dateTimeFormatter.format(LocalDateTime.now()));
         sb.append(", nostradamus-spider:\n");
 
-        List<User> sortedUsers = new ArrayList<>(users.values());
-        Collections.sort(sortedUsers);
+        List<User> sortedUsers = users.values().stream()
+                .sorted()
+                .collect(Collectors.toList());
 
         int p = 1;
         for (User user : sortedUsers) {
@@ -103,7 +108,7 @@ public class NostradamusCrawler {
             sb.append(user.getScore());
             sb.append(", pozicija na nostradamusu: ");
             sb.append(user.getRanking());
-            sb.append("\n");
+            sb.append('\n');
         }
 
         return sb.toString();
