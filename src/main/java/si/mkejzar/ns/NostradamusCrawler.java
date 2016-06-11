@@ -1,6 +1,5 @@
 package si.mkejzar.ns;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -24,16 +24,7 @@ import java.util.regex.Pattern;
  */
 public class NostradamusCrawler {
 
-    private final Map<String, User> users = ImmutableMap.<String, User>builder()
-            .put("mm04", new User("Matija", "mm04"))
-            .put("sp_nostradamus", new User("Igor", "sp_nostradamus"))
-            .put("frimili", new User("Emil", "frimili"))
-            .put("SuperMario45", new User("Blaž", "SuperMario45"))
-            .put("HHrv", new User("Helena", "HHrv"))
-            .put("grega,gor", new User("Grega", "grega.gor"))
-            .put("skipper3k", new User("Luka", "skipper3k"))
-            .put("zzl02", new User("Žiga", "zzl02"))
-            .build();
+    private final Map<String, User> users;
 
     private final String baseUrl = "http://www.rtvslo.si/nostradamus/evropsko-prvenstvo-francija-2016/lestvica";
     private final String page = "/?page=";
@@ -42,15 +33,27 @@ public class NostradamusCrawler {
 
     private final Map<User, Pattern> regexMap = new HashMap<>();
 
+    public NostradamusCrawler() {
+        users = new LinkedHashMap<>();
+        users.put("mm04", new User("Matija", "mm04"));
+        users.put("sp_nostradamus", new User("Igor", "sp_nostradamus"));
+        users.put("frimili", new User("Emil", "frimili"));
+        users.put("SuperMario45", new User("Blaž", "SuperMario45"));
+        users.put("HHrv", new User("Helena", "HHrv"));
+        users.put("grega,gor", new User("Grega", "grega.gor"));
+        users.put("skipper3k", new User("Luka", "skipper3k"));
+        users.put("zzl02", new User("Žiga", "zzl02"));
+    }
+
     public void crawl() throws IOException {
 
         List<User> usersToFind = new ArrayList<>(users.values());
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpClient httpClient = HttpClients.createDefault();
 
         for (int p = 0; p < pages && !usersToFind.isEmpty(); p++) {
-            HttpGet httpget = new HttpGet((baseUrl + page) + p);
-            CloseableHttpResponse response = httpclient.execute(httpget);
+            HttpGet httpget = new HttpGet(baseUrl + page + p);
+            CloseableHttpResponse response = httpClient.execute(httpget);
             System.out.println("Reading page " + p);
             if (response.getStatusLine().getStatusCode() != 200) {
                 System.out.println("Did not receive 200, exiting after " + httpget.getURI());
@@ -109,7 +112,8 @@ public class NostradamusCrawler {
     private Pattern regexForUser(User user) {
         Pattern regex = regexMap.get(user);
         if (regex == null) {
-            regex = Pattern.compile("<td class=\"tac\">(\\d+)\\.</td>\n\\s*\n\\s*<td><a href=\"/profil/\\S+\">" + user.getUsername() + "</a></td>\n\\s+<td class=\"tac\">(\\d+)</td>");
+            regex = Pattern.compile("<td class=\"tac\">(\\d+)\\.</td>\n\\s*\n\\s*<td><a href=\"/profil/\\S+\">" + user
+                    .getUsername() + "</a></td>\n\\s+<td class=\"tac\">(\\d+)</td>");
             regexMap.put(user, regex);
         }
 
