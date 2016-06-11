@@ -10,7 +10,12 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +32,7 @@ public class NostradamusCrawler {
             .put("HHrv", new User("Helena", "HHrv"))
             .put("grega,gor", new User("Grega", "grega.gor"))
             .put("skipper3k", new User("Luka", "skipper3k"))
+            .put("zzl02", new User("Žiga", "zzl02"))
             .build();
 
     private final String baseUrl = "http://www.rtvslo.si/nostradamus/evropsko-prvenstvo-francija-2016/lestvica";
