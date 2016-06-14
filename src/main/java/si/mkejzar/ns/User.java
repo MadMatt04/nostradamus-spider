@@ -11,6 +11,8 @@ public class User implements Comparable<User> {
     private int score;
     private int ranking = 10000;
 
+    private double percentage;
+
     public User() {
     }
 
@@ -49,6 +51,14 @@ public class User implements Comparable<User> {
 
     public void setRanking(int ranking) {
         this.ranking = ranking;
+    }
+
+    public double getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(double percentage) {
+        this.percentage = percentage;
     }
 
     @Override

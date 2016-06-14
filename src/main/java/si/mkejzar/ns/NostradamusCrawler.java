@@ -7,6 +7,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -33,6 +35,19 @@ public class NostradamusCrawler {
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd. MM. uuuu HH:mm");
 
     private final Map<User, Pattern> regexMap = new HashMap<>();
+
+    private final AtomicReference<User> leader = new AtomicReference<>();
+
+
+    private static final Pattern LEADER_PATTERN = Pattern.compile(
+            "<td class=\"tac\">1\\.</td>\n\\s*\n\\s*<td><a href=\"/profil/\\S+\">(.+)</a></td>\n\\s+<td class=\"tac\">(\\d+)</td>");
+
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getPercentInstance();
+
+    static {
+        NUMBER_FORMAT.setMinimumFractionDigits(1);
+        NUMBER_FORMAT.setMaximumFractionDigits(1);
+    }
 
     public NostradamusCrawler() {
         users = new LinkedHashMap<>();
@@ -65,7 +80,26 @@ public class NostradamusCrawler {
                     System.out.println("Did not receive 200, exiting after " + httpget.getURI());
                 }
 
+
                 String content = EntityUtils.toString(response.getEntity());
+
+                if (p == 0) {
+                    Matcher m = LEADER_PATTERN.matcher(content);
+                    if (m.find()) {
+                        String username = m.group(1);
+                        int score = Integer.parseInt(m.group(2));
+
+                        User leaderUser = new User("Skupno vodilni", username);
+                        leaderUser.setRanking(1);
+                        leaderUser.setScore(score);
+                        calculatePercentage(leaderUser);
+
+                        leader.set(leaderUser);
+
+                        System.out.println("Leader found: " + leaderUser);
+                    }
+                }
+
                 for (Iterator<User> it = usersToFind.iterator(); it.hasNext(); ) {
                     User user = it.next();
                     System.out.print("Looking for user " + user.getUsername() + "...");
@@ -78,6 +112,7 @@ public class NostradamusCrawler {
                         System.out.println("FOUND, pts: " + score + ", ranking: " + ranking);
                         user.setScore(score);
                         user.setRanking(ranking);
+                        calculatePercentage(user);
                         it.remove();
                     } else {
                         System.out.println("not found");
@@ -106,10 +141,26 @@ public class NostradamusCrawler {
             sb.append(user.getUsername());
             sb.append(") ");
             sb.append(user.getScore());
-            sb.append(", pozicija na nostradamusu: ");
+            sb.append(" (");
+            sb.append(NUMBER_FORMAT.format(user.getPercentage()));
+            sb.append(" točk), pozicija na nostradamusu: ");
             sb.append(user.getRanking());
             sb.append('\n');
         }
+
+        sb.append("------\n");
+        User leaderUser = leader.get();
+        sb.append("Skupno vodilni: ");
+        sb.append(leaderUser.getRanking());
+        sb.append(". ");
+        sb.append(leaderUser.getUsername());
+        sb.append(": ");
+        sb.append(leaderUser.getScore());
+        sb.append(" od ");
+        sb.append(MatchesData.TOTAL_POINTS);
+        sb.append(" točk (");
+        sb.append(NUMBER_FORMAT.format(leaderUser.getPercentage()));
+        sb.append(")\n");
 
         return sb.toString();
     }
@@ -123,6 +174,10 @@ public class NostradamusCrawler {
         }
 
         return regex;
+    }
+
+    private void calculatePercentage(User user) {
+        user.setPercentage((double)user.getScore() / (double)MatchesData.TOTAL_POINTS);
     }
 
     public static void main(String[] args) throws IOException {
