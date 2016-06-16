@@ -10,12 +10,7 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -160,7 +155,8 @@ public class NostradamusCrawler {
         sb.append(MatchesData.TOTAL_POINTS);
         sb.append(" točk (");
         sb.append(NUMBER_FORMAT.format(leaderUser.getPercentage()));
-        sb.append(")\n");
+        sb.append("), vseh tekem: ");
+        sb.append(MatchesData.TOTAL_MATCHES);
 
         return sb.toString();
     }
