@@ -10,7 +10,12 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,8 +59,9 @@ public class NostradamusCrawler {
         users.put("grega,gor", new User("Grega", "grega.gor"));
         users.put("skipper3k", new User("Luka", "skipper3k"));
         users.put("zzl02", new User("Žiga", "zzl02"));
+        users.put("Nutrij", new User("Marko", "Nutrij"));
 
-        baseUrl = "http://www.rtvslo.si/nostradamus/evropsko-prvenstvo-francija-2016/lestvica";
+        baseUrl = "http://www.rtvslo.si/nostradamus/svetovno-prvenstvo-rusija-2018/lestvica";
         page = "/?page=";
         pages = 35;
     }
@@ -138,7 +144,7 @@ public class NostradamusCrawler {
             sb.append(user.getScore());
             sb.append(" (");
             sb.append(NUMBER_FORMAT.format(user.getPercentage()));
-            sb.append(" točk), pozicija na nostradamusu: ");
+            sb.append(" točk), pozicija: ");
             sb.append(user.getRanking());
             sb.append('\n');
         }
