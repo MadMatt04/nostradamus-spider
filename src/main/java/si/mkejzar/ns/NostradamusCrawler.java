@@ -53,13 +53,14 @@ public class NostradamusCrawler {
         users = new LinkedHashMap<>();
         users.put("mm04", new User("Matija", "mm04"));
         users.put("sp_nostradamus", new User("Igor", "sp_nostradamus"));
-        users.put("frimili", new User("Emil", "frimili"));
-        users.put("SuperMario45", new User("Blaž", "SuperMario45"));
-        users.put("HHrv", new User("Helena", "HHrv"));
+//        users.put("frimili", new User("Emil", "frimili"));
+//        users.put("SuperMario45", new User("Blaž", "SuperMario45"));
+//        users.put("HHrv", new User("Helena", "HHrv"));
         users.put("grega,gor", new User("Grega", "grega.gor"));
-        users.put("skipper3k", new User("Luka", "skipper3k"));
+//        users.put("skipper3k", new User("Luka", "skipper3k"));
         users.put("zzl02", new User("Žiga", "zzl02"));
         users.put("Nutrij", new User("Marko", "Nutrij"));
+        users.put("Moskvarina", new User("Katarina", "Moskvarina"));
 
         baseUrl = "http://www.rtvslo.si/nostradamus/svetovno-prvenstvo-rusija-2018/lestvica";
         page = "/?page=";
