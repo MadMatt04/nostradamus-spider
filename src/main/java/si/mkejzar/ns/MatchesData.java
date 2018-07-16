@@ -12,8 +12,8 @@ public class MatchesData {
     public static final int NORMAL_MATCH_WORTH = 3;
     public static final int DOUBLE_MATCH_WORTH = NORMAL_MATCH_WORTH * 2;
 
-    public static final int NORMAL_MATCHES = 23;
-    public static final int DOUBLE_MATCHES = 0;
+    public static final int NORMAL_MATCHES = 48;
+    public static final int DOUBLE_MATCHES = 16;
 
     public static final int TOTAL_POINTS = NORMAL_MATCHES * NORMAL_MATCH_WORTH + DOUBLE_MATCHES * DOUBLE_MATCH_WORTH;
     public static final int TOTAL_MATCHES = NORMAL_MATCHES + DOUBLE_MATCHES;
